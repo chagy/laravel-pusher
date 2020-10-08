@@ -2,6 +2,11 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Support\Facades\Response;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
+use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
@@ -32,6 +37,21 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        //
+        $this->renderable(function (JWTException $exception,$request){
+            return response(['error' => 'Token is not provided'],500);
+        });
+
+        $this->renderable(function(TokenBlacklistedException $exception,$request){
+            return response(['error' => 'Token can not be used, get new one'],500);
+        });
+
+        $this->renderable(function(TokenInvalidException $exception,$request){
+            return response(['error' => 'Token is invalid'],500);
+        });
+
+        $this->renderable(function(TokenExpiredException $exception,$request){
+            return response(['error' => 'Token is expire'],500);
+        });
     }
+
 }
